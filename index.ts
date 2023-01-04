@@ -3,9 +3,7 @@ import express from 'express';
 const app = express();
 const port = 8877;
 
-app.use(express.json());
-
-app.all('/translate', function (req, res) {
+app.get('/translate', function (req, res) {
   console.log('%s %s', req.method, req.url);
 
   let textToTranslate = req.query.text as string;
