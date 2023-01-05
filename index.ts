@@ -6,18 +6,18 @@ const port = 8877;
 app.get('/', function (req, res) {
   console.log('%s %s', req.method, req.url);
 
-  let textToTranslate = req.query.text as string;
+  let text = req.query.text as string;
 
   // Do something more useful here...
-  textToTranslate =
+  text =
     req.query.source +
     '>' +
     req.query.target +
     ' => [' +
-    textToTranslate.toUpperCase() +
+    text.toUpperCase() +
     ']';
 
-  res.status(200).send({ translation: textToTranslate });
+  res.status(200).send({ translation: text });
 });
 
 app.listen(port, function () {
