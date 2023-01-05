@@ -8,11 +8,12 @@ const port = 8877;
 
 app.get('/', (req, res) => {
   console.log('%s %s', req.method, req.url);
+
   const query = req.query;
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
-    axios({
+    axios<GoogleAPIResponseData>({
       method: 'post',
       url: 'https://translation.googleapis.com/language/translate/v2',
       params: {
@@ -49,6 +50,17 @@ app.get('/', (req, res) => {
     source: 'EN-US';
     target: 'KO';
     text: string;
+  }
+
+  interface GoogleAPIResponseData {
+    data: {
+      translations: Translation[];
+    };
+  }
+
+  interface Translation {
+    model: string;
+    translatedText: string;
   }
 });
 
