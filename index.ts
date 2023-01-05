@@ -7,8 +7,6 @@ const app = express();
 const port = 8877;
 
 app.get('/', (req, res) => {
-  console.log('%s %s', req.method, req.url);
-
   const query = req.query;
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
