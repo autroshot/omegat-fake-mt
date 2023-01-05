@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
         format: 'text',
         source: 'en',
         model: 'base',
-        key: process.env.GOOGLE_TRANSLATE_KEY,
+        key: process.env.GOOGLE_API_KEY,
       },
     })
       .then((axiosResponse) => {
