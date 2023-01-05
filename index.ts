@@ -3,7 +3,7 @@ import express from 'express';
 const app = express();
 const port = 8877;
 
-app.get('/translate', function (req, res) {
+app.get('/', function (req, res) {
   console.log('%s %s', req.method, req.url);
 
   let textToTranslate = req.query.text as string;
