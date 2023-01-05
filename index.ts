@@ -8,6 +8,7 @@ const port = 8877;
 
 app.get('/', (req, res) => {
   const query = req.query;
+
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
