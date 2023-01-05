@@ -3,7 +3,7 @@ import express from 'express';
 const app = express();
 const port = 8877;
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
   console.log('%s %s', req.method, req.url);
 
   let translatedText = '';
@@ -21,6 +21,6 @@ app.get('/', function (req, res) {
   res.status(200).send({ translation: translatedText });
 });
 
-app.listen(port, function () {
+app.listen(port, () => {
   console.log(`Fake TM Server listening on port ${port}!`);
 });
