@@ -1,3 +1,4 @@
+import console from 'console';
 import 'dotenv/config';
 import express from 'express';
 import axios from './node_modules/axios/index';
@@ -26,7 +27,9 @@ app.get('/', (req, res) => {
     })
       .then((axiosResponse) => {
         res.status(200).send({
-          translation: axiosResponse.data.data.translations[0].translatedText,
+          translation:
+            '[구글 번역 v2]\n' +
+            axiosResponse.data.data.translations[0].translatedText,
         });
       })
       .catch((axiosError) => {
