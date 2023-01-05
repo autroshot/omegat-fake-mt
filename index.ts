@@ -9,7 +9,7 @@ const port = 8877;
 app.get('/', (req, res) => {
   console.log('%s %s', req.method, req.url);
 
-  let text = req.query.text as string;
+  const text = req.query.text as string;
 
   axios({
     method: 'post',
@@ -24,11 +24,9 @@ app.get('/', (req, res) => {
     },
   })
     .then((axiosResponse) => {
-      res
-        .status(200)
-        .send({
-          translation: axiosResponse.data.data.translations[0].translatedText,
-        });
+      res.status(200).send({
+        translation: axiosResponse.data.data.translations[0].translatedText,
+      });
     })
     .catch((axiosError) => {
       res.status(400);
