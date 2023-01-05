@@ -1,5 +1,3 @@
 export function convertTagToSingleQuotationMarks(text: string): string {
-  let result = '';
-
-  return result;
+  return text.replace('<[a-z]d+/?>g', `'`);
 }
