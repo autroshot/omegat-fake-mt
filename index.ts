@@ -14,11 +14,13 @@ app.get('/', (req, res) => {
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
+    const convertedText = convertTagToSingleQuotationMarks(query.text);
+
     // axios<GoogleAPIResponseData>({
     //   method: 'post',
     //   url: 'https://translation.googleapis.com/language/translate/v2',
     //   params: {
-    //     q: convertTagToSingleQuotationMarks(query.text),
+    //     q: convertedText,
     //     target: 'ko',
     //     format: 'text',
     //     source: 'en',
@@ -47,7 +49,7 @@ app.get('/', (req, res) => {
       data: qs.stringify({
         source: 'en',
         target: 'ko',
-        text: convertTagToSingleQuotationMarks(query.text),
+        text: convertedText,
       }),
     })
       .then((axiosResponse) => {
