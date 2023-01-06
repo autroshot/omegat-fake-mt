@@ -26,14 +26,14 @@ app.get('/', (req, res) => {
       const naverPromise = promises[1];
 
       if (googlePromise.status === 'rejected') {
-        console.log(googlePromise.reason);
+        googleResult = `${googlePromise.reason.response.status}: ${googlePromise.reason.response.statusText}\n${googlePromise.reason.response.data.error.message}`;
       } else {
         googleResult =
           googlePromise.value.data.data.translations[0].translatedText;
       }
 
       if (naverPromise.status === 'rejected') {
-        console.log(naverPromise.reason);
+        naverResult = `${naverPromise.reason.response.status}: ${naverPromise.reason.response.statusText}\n${naverPromise.reason.response.data.errorCode}: ${naverPromise.reason.response.data.errorMessage}`;
       } else {
         naverResult = naverPromise.value.data.message.result.translatedText;
       }
