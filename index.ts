@@ -1,8 +1,8 @@
 import console from 'console';
 import 'dotenv/config';
 import express from 'express';
-import axios from './node_modules/axios/index';
 import qs from 'qs';
+import axios from './node_modules/axios/index';
 import { convertTagToSingleQuotationMarks } from './utils/text';
 
 const app = express();
