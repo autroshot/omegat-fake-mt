@@ -16,52 +16,34 @@ app.get('/', (req, res) => {
   } else {
     const convertedText = convertTagToSingleQuotationMarks(query.text);
 
-    // axios<GoogleAPIResponseData>({
-    //   method: 'post',
-    //   url: 'https://translation.googleapis.com/language/translate/v2',
-    //   params: {
-    //     q: convertedText,
-    //     target: 'ko',
-    //     format: 'text',
-    //     source: 'en',
-    //     model: 'base',
-    //     key: process.env.GOOGLE_API_KEY,
-    //   },
-    // })
-    //   .then((axiosResponse) => {
-    //     res.status(200).send({
-    //       translation:
-    //         '[구글 번역 v2]\n' +
-    //         axiosResponse.data.data.translations[0].translatedText,
-    //     });
-    //   })
-    //   .catch((axiosError) => {
-    //     res.status(axiosError.response.status).send();
-    //   });
-    axios<NaverAPIResponseData>({
-      method: 'post',
-      url: 'https://openapi.naver.com/v1/papago/n2mt',
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'X-Naver-Client-Id': process.env.NAVER_CLIENT_ID,
-        'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET,
-      },
-      data: qs.stringify({
-        source: 'en',
-        target: 'ko',
-        text: convertedText,
-      }),
-    })
-      .then((axiosResponse) => {
-        res.status(200).send({
-          translation:
-            '[네이버 파파고 번역]\n' +
-            axiosResponse.data.message.result.translatedText,
-        });
-      })
-      .catch((axiosError) => {
-        res.status(axiosError.response.status).send();
+    Promise.allSettled([
+      fetchGoogleTranslation(convertedText),
+      fetchNaverTranslation(convertedText),
+    ]).then((promises) => {
+      let googleResult = '';
+      let naverResult = '';
+      const googlePromise = promises[0];
+      const naverPromise = promises[1];
+
+      if (googlePromise.status === 'rejected') {
+        console.log(googlePromise.reason);
+      } else {
+        googleResult =
+          googlePromise.value.data.data.translations[0].translatedText;
+      }
+
+      if (naverPromise.status === 'rejected') {
+        console.log(naverPromise.reason);
+      } else {
+        naverResult = naverPromise.value.data.message.result.translatedText;
+      }
+
+      const mergedResult = `[구글 번역 v2]\n${googleResult}\n\n[네이버 파파고 번역]\n${naverResult}`;
+
+      res.status(200).send({
+        translation: mergedResult,
       });
+    });
   }
 
   function isValidRequestQuery(any: any): any is ValidRequestQuery {
@@ -73,6 +55,38 @@ app.get('/', (req, res) => {
       any.target === 'KO' &&
       typeof any.text === 'string'
     );
+  }
+
+  function fetchGoogleTranslation(text: string) {
+    return axios<GoogleAPIResponseData>({
+      method: 'post',
+      url: 'https://translation.googleapis.com/language/translate/v2',
+      params: {
+        q: text,
+        target: 'ko',
+        format: 'text',
+        source: 'en',
+        model: 'base',
+        key: process.env.GOOGLE_API_KEY,
+      },
+    });
+  }
+
+  function fetchNaverTranslation(text: string) {
+    return axios<NaverAPIResponseData>({
+      method: 'post',
+      url: 'https://openapi.naver.com/v1/papago/n2mt',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'X-Naver-Client-Id': process.env.NAVER_CLIENT_ID,
+        'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET,
+      },
+      data: qs.stringify({
+        source: 'en',
+        target: 'ko',
+        text: text,
+      }),
+    });
   }
 
   interface ValidRequestQuery {
