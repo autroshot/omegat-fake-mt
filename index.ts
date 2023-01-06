@@ -2,6 +2,7 @@ import console from 'console';
 import 'dotenv/config';
 import express from 'express';
 import axios from './node_modules/axios/index';
+import qs from 'qs';
 import { convertTagToSingleQuotationMarks } from './utils/text';
 
 const app = express();
@@ -13,23 +14,47 @@ app.get('/', (req, res) => {
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
-    axios<GoogleAPIResponseData>({
+    // axios<GoogleAPIResponseData>({
+    //   method: 'post',
+    //   url: 'https://translation.googleapis.com/language/translate/v2',
+    //   params: {
+    //     q: convertTagToSingleQuotationMarks(query.text),
+    //     target: 'ko',
+    //     format: 'text',
+    //     source: 'en',
+    //     model: 'base',
+    //     key: process.env.GOOGLE_API_KEY,
+    //   },
+    // })
+    //   .then((axiosResponse) => {
+    //     res.status(200).send({
+    //       translation:
+    //         '[구글 번역 v2]\n' +
+    //         axiosResponse.data.data.translations[0].translatedText,
+    //     });
+    //   })
+    //   .catch((axiosError) => {
+    //     res.status(axiosError.response.status).send();
+    //   });
+    axios<NaverAPIResponseData>({
       method: 'post',
-      url: 'https://translation.googleapis.com/language/translate/v2',
-      params: {
-        q: convertTagToSingleQuotationMarks(query.text),
-        target: 'ko',
-        format: 'text',
-        source: 'en',
-        model: 'base',
-        key: process.env.GOOGLE_API_KEY,
+      url: 'https://openapi.naver.com/v1/papago/n2mt',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'X-Naver-Client-Id': process.env.NAVER_CLIENT_ID,
+        'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET,
       },
+      data: qs.stringify({
+        source: 'en',
+        target: 'ko',
+        text: convertTagToSingleQuotationMarks(query.text),
+      }),
     })
       .then((axiosResponse) => {
         res.status(200).send({
           translation:
-            '[구글 번역 v2]\n' +
-            axiosResponse.data.data.translations[0].translatedText,
+            '[네이버 파파고 번역]\n' +
+            axiosResponse.data.message.result.translatedText,
         });
       })
       .catch((axiosError) => {
@@ -63,6 +88,16 @@ app.get('/', (req, res) => {
   interface Translation {
     model: string;
     translatedText: string;
+  }
+
+  interface NaverAPIResponseData {
+    message: {
+      result: {
+        srcLangType: 'ko';
+        tarLangType: 'en';
+        translatedText: string;
+      };
+    };
   }
 });
 
