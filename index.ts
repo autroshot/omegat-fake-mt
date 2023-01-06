@@ -26,19 +26,25 @@ app.get('/', (req, res) => {
       const naverPromise = promises[1];
 
       if (googlePromise.status === 'rejected') {
-        googleResult = `${googlePromise.reason.response.status}: ${googlePromise.reason.response.statusText}\n${googlePromise.reason.response.data.error.message}`;
+        googleResult = `${googlePromise.reason.response.status}: ${googlePromise.reason.response.statusText}
+${googlePromise.reason.response.data.error.message}`;
       } else {
         googleResult =
           googlePromise.value.data.data.translations[0].translatedText;
       }
 
       if (naverPromise.status === 'rejected') {
-        naverResult = `${naverPromise.reason.response.status}: ${naverPromise.reason.response.statusText}\n${naverPromise.reason.response.data.errorCode}: ${naverPromise.reason.response.data.errorMessage}`;
+        naverResult = `${naverPromise.reason.response.status}: ${naverPromise.reason.response.statusText}
+${naverPromise.reason.response.data.errorCode}: ${naverPromise.reason.response.data.errorMessage}`;
       } else {
         naverResult = naverPromise.value.data.message.result.translatedText;
       }
 
-      const mergedResult = `[구글 번역 v2]\n${googleResult}\n\n[네이버 파파고 번역]\n${naverResult}`;
+      const mergedResult = `[구글 번역 v2]
+${googleResult}
+
+[네이버 파파고 번역]
+${naverResult}`;
 
       res.status(200).send({
         translation: mergedResult,
