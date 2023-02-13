@@ -8,6 +8,17 @@ import { convertTagToSingleQuotationMarks } from './utils/text';
 const app = express();
 const port = 8877;
 
+const naverClient: NaverClient[] = [];
+for (let i = 1; i <= 5; i++) {
+  const id = process.env[`NAVER_CLIENT_ID_${i}`];
+  const secret = process.env[`NAVER_CLIENT_SECRET_${i}`];
+
+  if (id && secret) {
+    naverClient.push({ id, secret });
+  }
+}
+let currentNaverClientIndex = 0;
+
 app.get('/', (req, res) => {
   const query = req.query;
 
@@ -45,6 +56,13 @@ ${googleResult}
 
 [네이버 파파고 번역]
 ${naverResult}`;
+
+      if (currentNaverClientIndex >= naverClient.length - 1) {
+        currentNaverClientIndex = 0;
+      }
+      {
+        currentNaverClientIndex += 1;
+      }
 
       res.status(200).send({
         translation: mergedResult,
@@ -84,8 +102,8 @@ ${naverResult}`;
       url: 'https://openapi.naver.com/v1/papago/n2mt',
       headers: {
         'content-type': 'application/x-www-form-urlencoded',
-        'X-Naver-Client-Id': process.env.NAVER_CLIENT_ID,
-        'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET,
+        'X-Naver-Client-Id': naverClient[currentNaverClientIndex].id,
+        'X-Naver-Client-Secret': naverClient[currentNaverClientIndex].secret,
       },
       data: qs.stringify({
         source: 'en',
@@ -126,3 +144,8 @@ ${naverResult}`;
 app.listen(port, () => {
   console.log(`Fake TM Server listening on port ${port}!`);
 });
+
+interface NaverClient {
+  id: string;
+  secret: string;
+}
