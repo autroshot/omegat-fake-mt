@@ -44,6 +44,11 @@ ${googlePromise.reason.response.data.error.message}`;
       } else {
         googleResult =
           googlePromise.value.data.glossaryTranslations[0].translatedText;
+        googleResult = `(용어집 적용)
+${googlePromise.value.data.glossaryTranslations[0].translatedText}
+
+(기본)
+${googlePromise.value.data.translations[0].translatedText}`;
       }
 
       if (naverPromise.status === 'rejected') {
