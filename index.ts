@@ -1,6 +1,7 @@
 import console from 'console';
 import 'dotenv/config';
 import express from 'express';
+import { JWT } from 'google-auth-library';
 import qs from 'qs';
 import axios from './node_modules/axios/index';
 import { convertTagToSingleQuotationMarks } from './utils/text';
@@ -41,7 +42,7 @@ app.get('/', (req, res) => {
 ${googlePromise.reason.response.data.error.message}`;
       } else {
         googleResult =
-          googlePromise.value.data.data.translations[0].translatedText;
+          googlePromise.value.data.glossaryTranslations[0].translatedText;
       }
 
       if (naverPromise.status === 'rejected') {
@@ -51,7 +52,7 @@ ${naverPromise.reason.response.data.errorCode}: ${naverPromise.reason.response.d
         naverResult = naverPromise.value.data.message.result.translatedText;
       }
 
-      const mergedResult = `[구글 번역 v2]
+      const mergedResult = `[구글 번역 v3]
 ${googleResult}
 
 [네이버 파파고 번역]
@@ -82,18 +83,31 @@ ${naverResult}`;
   }
 
   function fetchGoogleTranslation(text: string) {
-    return axios<GoogleAPIResponseData>({
-      method: 'post',
-      url: 'https://translation.googleapis.com/language/translate/v2',
-      params: {
-        q: text,
-        target: 'ko',
-        format: 'text',
-        source: 'en',
-        model: 'base',
-        key: process.env.GOOGLE_API_KEY,
-      },
+    const JWTClient = new JWT({
+      email: process.env.GOOGLE_CLIENT_EMAIL,
+      key: String(process.env.GOOGLE_PRIVATE_KEY).replace(/\\n/gm, '\n'),
+      scopes: [
+        'https://www.googleapis.com/auth/cloud-platform',
+        'https://www.googleapis.com/auth/cloud-translation',
+      ],
     });
+
+    return JWTClient.request<GoogleAPIResponse>({
+      url: `https://translate.googleapis.com/v3/projects/${process.env.GOOGLE_PROJECT_NUMBER}/locations/us-central1:translateText`,
+      method: 'POST',
+      data: createGoogleAPIRequestBody(),
+    });
+
+    function createGoogleAPIRequestBody() {
+      return {
+        contents: text,
+        sourceLanguageCode: 'en',
+        targetLanguageCode: 'ko',
+        glossaryConfig: {
+          glossary: `projects/${process.env.GOOGLE_PROJECT_NUMBER}/locations/us-central1/glossaries/${process.env.GOOGLE_GLOSSARY_ID}`,
+        },
+      };
+    }
   }
 
   function fetchNaverTranslation(text: string) {
@@ -119,15 +133,21 @@ ${naverResult}`;
     text: string;
   }
 
-  interface GoogleAPIResponseData {
-    data: {
-      translations: Translation[];
-    };
-  }
-
-  interface Translation {
-    model: string;
-    translatedText: string;
+  interface GoogleAPIResponse {
+    translations: [
+      {
+        translatedText: string;
+      }
+    ];
+    glossaryTranslations: [
+      {
+        translatedText: string;
+        glossaryConfig: {
+          glossary: string;
+          ignoreCase: boolean;
+        };
+      }
+    ];
   }
 
   interface NaverAPIResponseData {
