@@ -26,10 +26,11 @@ app.get('/', (req, res) => {
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
-    const convertedText = convertTagToSingleQuotationMarks(query.text);
+    const text = query.text;
+    const convertedText = convertTagToSingleQuotationMarks(text);
 
     Promise.allSettled([
-      fetchGoogleTranslation(convertedText),
+      fetchGoogleTranslation(text),
       fetchNaverTranslation(convertedText),
     ]).then((promises) => {
       let googleResult = '';
