@@ -1,4 +1,4 @@
-export function convertTagToSingleQuotationMarks(text: string): string {
+export function convertTagToApostrophe(text: string): string {
   return text.replace(/<\/?[a-z]\d+\/?>/g, `'`);
 }
 

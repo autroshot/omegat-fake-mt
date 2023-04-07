@@ -6,7 +6,7 @@ import qs from 'qs';
 import axios from './node_modules/axios/index';
 import {
   convertApostropheHTMLCodeToText,
-  convertTagToSingleQuotationMarks,
+  convertTagToApostrophe,
 } from './utils/text';
 
 const app = express();
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
-    const convertedText = convertTagToSingleQuotationMarks(query.text);
+    const convertedText = convertTagToApostrophe(query.text);
 
     Promise.allSettled([
       fetchGoogleTranslation(convertedText),
