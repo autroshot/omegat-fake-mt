@@ -4,7 +4,10 @@ import express from 'express';
 import { JWT } from 'google-auth-library';
 import qs from 'qs';
 import axios from './node_modules/axios/index';
-import { convertTagToSingleQuotationMarks } from './utils/text';
+import {
+  convertApostropheHTMLCodeToText,
+  convertTagToSingleQuotationMarks,
+} from './utils/text';
 
 const app = express();
 const port = 8877;
@@ -41,13 +44,22 @@ app.get('/', (req, res) => {
         googleResult = `${googlePromise.reason.response.status}: ${googlePromise.reason.response.statusText}
 ${googlePromise.reason.response.data.error.message}`;
       } else {
-        googleResult =
+        const glossaryTranslatedText =
           googlePromise.value.data.glossaryTranslations[0].translatedText;
+        const translatedText =
+          googlePromise.value.data.translations[0].translatedText;
+
+        const convertedGlossaryTranslatedText = convertApostropheHTMLCodeToText(
+          glossaryTranslatedText
+        );
+        const convertedTranslatedText =
+          convertApostropheHTMLCodeToText(translatedText);
+
         googleResult = `(용어집 적용)
-${googlePromise.value.data.glossaryTranslations[0].translatedText}
+${convertedGlossaryTranslatedText}
 
 (기본)
-${googlePromise.value.data.translations[0].translatedText}`;
+${convertedTranslatedText}`;
       }
 
       if (naverPromise.status === 'rejected') {
