@@ -29,10 +29,11 @@ app.get('/', (req, res) => {
   if (!isValidRequestQuery(query)) {
     res.status(400).send();
   } else {
+    const text = query.text;
     const convertedText = convertTagToApostrophe(query.text);
 
     Promise.allSettled([
-      fetchGoogleTranslation(convertedText),
+      fetchGoogleTranslation(text),
       fetchNaverTranslation(convertedText),
     ]).then((promises) => {
       let googleResult = '';
@@ -118,6 +119,7 @@ ${naverResult}`;
     function createGoogleAPIRequestBody() {
       return {
         contents: text,
+        mimeType: 'text/plain',
         sourceLanguageCode: 'en',
         targetLanguageCode: 'ko',
         glossaryConfig: {
