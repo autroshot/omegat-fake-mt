@@ -1,9 +1,8 @@
 import console from 'console';
 import 'dotenv/config';
 import express from 'express';
-import qs from 'qs';
 import { fetchTranslation as fetchGoogleTranslation } from './google';
-import axios from './node_modules/axios/index';
+import { fetchTranslation as fetchNaverTranslation } from './naver';
 import {
   convertApostropheHTMLCodeToText,
   convertTagToApostrophe,
@@ -34,7 +33,10 @@ app.get('/', (req, res) => {
 
     Promise.allSettled([
       fetchGoogleTranslation(text),
-      fetchNaverTranslation(convertedText),
+      fetchNaverTranslation(
+        convertedText,
+        naverClient[currentNaverClientIndex]
+      ),
     ]).then((promises) => {
       let googleResult = '';
       let naverResult = '';
@@ -100,37 +102,10 @@ ${naverResult}`;
     );
   }
 
-  function fetchNaverTranslation(text: string) {
-    return axios<NaverAPIResponseData>({
-      method: 'post',
-      url: 'https://openapi.naver.com/v1/papago/n2mt',
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'X-Naver-Client-Id': naverClient[currentNaverClientIndex].id,
-        'X-Naver-Client-Secret': naverClient[currentNaverClientIndex].secret,
-      },
-      data: qs.stringify({
-        source: 'en',
-        target: 'ko',
-        text: text,
-      }),
-    });
-  }
-
   interface ValidRequestQuery {
     source: 'EN-US';
     target: 'KO';
     text: string;
-  }
-
-  interface NaverAPIResponseData {
-    message: {
-      result: {
-        srcLangType: 'ko';
-        tarLangType: 'en';
-        translatedText: string;
-      };
-    };
   }
 });
 
@@ -138,7 +113,7 @@ app.listen(port, () => {
   console.log(`Fake TM Server listening on port ${port}!`);
 });
 
-interface NaverClient {
+export interface NaverClient {
   id: string;
   secret: string;
 }
