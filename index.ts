@@ -12,13 +12,13 @@ import {
 const app = express();
 const port = 8877;
 
-const naverClient: NaverClient[] = [];
+const naverClients: NaverClient[] = [];
 for (let i = 1; i <= 5; i++) {
   const id = process.env[`NAVER_CLIENT_ID_${i}`];
   const secret = process.env[`NAVER_CLIENT_SECRET_${i}`];
 
   if (id && secret) {
-    naverClient.push({ id, secret });
+    naverClients.push({ id, secret });
   }
 }
 let currentNaverClientIndex = 0;
@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
       fetchGoogleTranslation(text),
       fetchNaverTranslation(
         convertedText,
-        naverClient[currentNaverClientIndex]
+        naverClients[currentNaverClientIndex]
       ),
     ]).then((promises) => {
       let googleResult = '';
@@ -79,7 +79,7 @@ ${googleResult}
 [네이버 파파고 번역]
 ${naverResult}`;
 
-      if (currentNaverClientIndex >= naverClient.length - 1) {
+      if (currentNaverClientIndex >= naverClients.length - 1) {
         currentNaverClientIndex = 0;
       }
       {
