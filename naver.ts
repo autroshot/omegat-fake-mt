@@ -1,6 +1,6 @@
 import axios from 'axios';
 import qs from 'qs';
-import { NaverClient } from '.';
+import { NaverClient } from './types';
 
 export function fetchTranslation(text: string, client: NaverClient) {
   return axios<NaverAPIResponseData>({

@@ -3,6 +3,7 @@ import 'dotenv/config';
 import express from 'express';
 import { fetchTranslation as fetchGoogleTranslation } from './google';
 import { fetchTranslation as fetchNaverTranslation } from './naver';
+import { NaverClient } from './types';
 import {
   convertApostropheHTMLCodeToText,
   convertTagToApostrophe,
@@ -112,8 +113,3 @@ ${naverResult}`;
 app.listen(port, () => {
   console.log(`Fake TM Server listening on port ${port}!`);
 });
-
-export interface NaverClient {
-  id: string;
-  secret: string;
-}
