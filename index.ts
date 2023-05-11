@@ -12,16 +12,25 @@ import {
 const app = express();
 const port = 8877;
 
-const naverClients: NaverClient[] = [];
-for (let i = 1; i <= 5; i++) {
-  const id = process.env[`NAVER_CLIENT_ID_${i}`];
-  const secret = process.env[`NAVER_CLIENT_SECRET_${i}`];
-
-  if (id && secret) {
-    naverClients.push({ id, secret });
-  }
-}
+const naverClients = getNaverClients();
 let currentNaverClientIndex = 0;
+
+function getNaverClients(): NaverClient[] {
+  const result: NaverClient[] = [];
+
+  let i = 1;
+  while (true) {
+    const id = process.env[`NAVER_CLIENT_ID_${i}`];
+    const secret = process.env[`NAVER_CLIENT_SECRET_${i}`];
+
+    if (!id || !secret || i >= 50) break;
+
+    result.push({ id, secret });
+    i += 1;
+  }
+
+  return result;
+}
 
 app.get('/', (req, res) => {
   const query = req.query;
