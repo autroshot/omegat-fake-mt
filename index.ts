@@ -73,8 +73,7 @@ ${naverResult}`;
 
       if (currentNaverClientIndex >= naverClients.length - 1) {
         currentNaverClientIndex = 0;
-      }
-      {
+      } else {
         currentNaverClientIndex += 1;
       }
 
