@@ -48,10 +48,10 @@ ${googlePromise.reason.response.data.error.message}`;
         const convertedTranslatedText =
           convertApostropheHTMLCodeToText(translatedText);
 
-        googleResult = `(용어집 적용)
+        googleResult = `## 용어집 적용
 ${convertedGlossaryTranslatedText}
 
-(기본)
+## 기본
 ${convertedTranslatedText}`;
       }
 
@@ -62,10 +62,10 @@ ${naverPromise.reason.response.data.errorCode}: ${naverPromise.reason.response.d
         naverResult = naverPromise.value.data.message.result.translatedText;
       }
 
-      const mergedResult = `[구글 번역 v3]
+      const mergedResult = `# 구글 번역 v3
 ${googleResult}
 
-[네이버 파파고 번역]
+# 네이버 파파고 번역
 ${naverResult}`;
 
       res.status(200).send({
