@@ -4,6 +4,7 @@ import express from 'express';
 import { fetchTranslation as fetchGoogleTranslation } from './google';
 import { fetchTranslation as fetchNaverTranslation } from './naver';
 import { NaverClient } from './types';
+import { getRandomElement } from './utils/general';
 import {
   convertApostropheHTMLCodeToText,
   convertTagToApostrophe,
@@ -13,7 +14,6 @@ const app = express();
 const port = 8877;
 
 const naverClients = getNaverClients();
-let currentNaverClientIndex = 0;
 
 app.get('/', (req, res) => {
   const query = req.query;
@@ -26,10 +26,7 @@ app.get('/', (req, res) => {
 
     Promise.allSettled([
       fetchGoogleTranslation(text),
-      fetchNaverTranslation(
-        convertedText,
-        naverClients[currentNaverClientIndex]
-      ),
+      fetchNaverTranslation(convertedText, getRandomElement(naverClients)),
     ]).then((promises) => {
       let googleResult = '';
       let naverResult = '';
@@ -70,12 +67,6 @@ ${googleResult}
 
 [네이버 파파고 번역]
 ${naverResult}`;
-
-      if (currentNaverClientIndex >= naverClients.length - 1) {
-        currentNaverClientIndex = 0;
-      } else {
-        currentNaverClientIndex += 1;
-      }
 
       res.status(200).send({
         translation: mergedResult,
