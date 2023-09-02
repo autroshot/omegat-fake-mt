@@ -1,6 +1,7 @@
 import console from 'console';
 import 'dotenv/config';
 import express from 'express';
+import { fetchTranslation as fetchDeepLTranslation } from './deepl';
 import { fetchTranslation as fetchGoogleTranslation } from './google';
 import { fetchTranslation as fetchNaverTranslation } from './naver';
 import { NaverClient } from './types';
@@ -27,11 +28,14 @@ app.get('/', (req, res) => {
     Promise.allSettled([
       fetchGoogleTranslation(text),
       fetchNaverTranslation(convertedText, getRandomElement(naverClients)),
+      fetchDeepLTranslation(text),
     ]).then((promises) => {
       let googleResult = '';
       let naverResult = '';
+      let deepLResult = '';
       const googlePromise = promises[0];
       const naverPromise = promises[1];
+      const deepLPromise = promises[2];
 
       if (googlePromise.status === 'rejected') {
         googleResult = `${googlePromise.reason.response.status}: ${googlePromise.reason.response.statusText}
@@ -62,8 +66,17 @@ ${naverPromise.reason.response.data.errorCode}: ${naverPromise.reason.response.d
         naverResult = naverPromise.value.data.message.result.translatedText;
       }
 
+      if (deepLPromise.status === 'rejected') {
+        deepLResult = String(deepLPromise.reason);
+      } else {
+        deepLResult = deepLPromise.value.text;
+      }
+
       const mergedResult = `# 구글 번역 v3
 ${googleResult}
+
+# DeepL 번역
+${deepLResult}
 
 # 네이버 파파고 번역
 ${naverResult}`;
