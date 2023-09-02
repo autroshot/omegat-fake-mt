@@ -1,7 +1,7 @@
 import console from 'console';
 import 'dotenv/config';
 import express from 'express';
-import { fetchTranslation as fetchDeepLTranslation } from './deepl';
+import { fetchTranslation as fetchDeepLTranslation } from './deepL';
 import { fetchTranslation as fetchGoogleTranslation } from './google';
 import { fetchTranslation as fetchNaverTranslation } from './naver';
 import { NaverClient } from './types';
